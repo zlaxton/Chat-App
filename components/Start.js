@@ -56,7 +56,7 @@ export default class Start extends React.Component {
               style={styles.color4}
               onPress={() => this.setState({ backgroundColor: "#5E6B61" })}
             />
-          </View>
+          </View> 
         </View>
         <TouchableOpacity
           style={styles.chatButton}
