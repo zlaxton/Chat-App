@@ -8,7 +8,7 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: name });
 
     return (
-      <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flex:1, justifyContent: 'center', alignItems: 'center', backgroundColor: "yellow"}}>
         <Button
         title="Go to Start"
         onPress={() => this.props.navigation.navigate("Start")}
