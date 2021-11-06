@@ -39,11 +39,7 @@ export default class Chat extends React.Component {
       ],
     })
   }
-  // Check if user is online or offline
-  NetInfo.fetch().then(connection => { 
-    if (connection.isConnected) {
-      this.setState({ isConnected: true });
-      console.log('online');
+  
   onSend(messages = []) {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
