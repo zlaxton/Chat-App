@@ -1,13 +1,7 @@
 import React from 'react';
 import { View, Platform, Text, Button, KeyboardAvoidingView, ImageBackground, TextInput, StyleSheet} from 'react-native';
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
-// Mapview Component
-import MapView from 'react-native-maps';
-//Async Storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-//NetInfo
-import NetInfo from '@react-native-community/netinfo';
 
 
 export default class Chat extends React.Component {
