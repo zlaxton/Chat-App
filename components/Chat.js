@@ -96,6 +96,8 @@ renderBubble(props) {
       messages: GiftedChat.append(previousState.messages, messages),
     }));
   }
+
+  
   componentDidMount() {
     this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
@@ -138,7 +140,19 @@ render() {
     this.unsubscribeListUser();
   }
 }
-  
+onCollectionUpdate = (querySnapshot) => {
+  const messages = [];
+  // go through each document
+  querySnapshot.forEach((doc) => {
+    // get the QueryDocumentSnapshot's data
+    let data = doc.data();
+    messages.push({
+      _id: data._id,
+      text: data.text,
+      createdAt: data.createdAt.toDate(),
+      user: data.user,
+    });
+  }); 
   
   
 
@@ -160,4 +174,4 @@ const styles = StyleSheet.create({
     fontSize: 30,
   }
 });
-
+}
