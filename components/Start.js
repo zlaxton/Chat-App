@@ -1,279 +1,151 @@
-import React, { Component } from "react";
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-  LogBox,
-  Image,
-  Pressable,
-} from "react-native";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import React, { useState, useEffect } from 'react';
+import { View, Text,TextInput, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 
-//importing background images and logos
-import bgImage from "../images/pure-bg.png";
-import logo from "../images/icon.png";
-import Icon from "react-native-vector-icons/FontAwesome";
-import green from "../images/green.jpg";
-import pastel from "../images/pastel.jpg";
-import rainbow from "../images/rainbow.jpg";
-import yellow from "../images/yellow.jpg";
+// Set the Background Image
+const background = require('../images/pastel.jpg');
+// Background color options - Green, Blue, Purple, Gray, White
+const colors = ['#408337', '#3a5d84', '#78519d', '#606670', '#FFFFFF'];
 
-/**
- * Start is the component that gets renderd as a splash screen
- * from where the user can type a name and pick a background color
- * to use during the chat experience
- */
-class Start extends Component {
-  // The state of the current component
-  state = {
-    name: "",
-    bgColor: "#fff",
-    bgImage: rainbow,
-  };
-
-  /**
-   * Updates the state with the background image picked from the swatch
-   * @param {*} img the new color used to update the state
-   */
-  setBgImage = (img) => {
-    this.setState({ bgImage: img });
-  };
-
-  /**
-   * lifecycle method that runs when component mounts
-   */
-  componentDidMount() {
-    LogBox.ignoreAllLogs();
+export default class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state ={
+      name: '',
+      backgroundColor: '#408337',
+    }
   }
 
+  // Check for username
+  onGoToChat = (name, backgroundColor) => {
+    if(name == '') {
+      return Alert.alert('Please enter your name.');
+    }
+    this.props.navigation.navigate('Chat', {
+      name: `${name}`,
+      backgroundColor: `${backgroundColor}`,
+    });
+  };
+
   render() {
+    const setColor = this.state.backgroundColor;
     return (
-      <View style={styles.container}>
-        <ImageBackground
-          source={bgImage}
-          resizeMode="cover"
-          style={styles.bgImage}
-        >
-          <Image
-            accessible={true}
-            accessibilityLabel="Texter logo"
-            accessibilityHint="The logo is a smily face and under it there is the app title 'Texter'"
-            accessibilityRole="image"
-            style={styles.logo}
-            source={logo}
-          />
-          <View style={styles.box}>
-            <View style={styles.inputField}>
-              <Icon
-                style={styles.iconStyle}
-                name="user"
-                size={30}
-                color="#888"
-              />
-              <TextInput
-                accessible={true}
-                accessibilityLabel="Your Name"
-                accessibilityHint="Type the name you want to use in the chat session"
-                style={styles.input}
-                onChangeText={(text) => this.setState({ name: text })}
-                value={this.state.name}
-                placeholder="Your Name"
-              />
-            </View>
-            <View style={styles.colorSwatch}>
-              <Text style={styles.subtitle}>Choose Background Color</Text>
-              <View style={styles.swatches}>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel="Select green background"
-                  accessibilityHint="Lets you choose a background for the chat screen"
-                  accessibilityRole="button"
-                  onPress={() => this.setBgImage(green)}
-                >
-                  <View style={styles.swatch1}></View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel="Select magenta background"
-                  accessibilityHint="Lets you choose a magenta background for the chat screen"
-                  accessibilityRole="button"
-                  onPress={() => this.setBgImage(pastel)}
-                >
-                  <View style={styles.swatch2}></View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel="Select fucsia background"
-                  accessibilityHint="Lets you choose a fucsia background for the chat screen"
-                  accessibilityRole="button"
-                  onPress={() => this.setBgImage(rainbow)}
-                >
-                  <View style={styles.swatch3}></View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel="Select purple background"
-                  accessibilityHint="Lets you choose a purple background for the chat screen"
-                  accessibilityRole="button"
-                  onPress={() => this.setBgImage(yellow)}
-                >
-                  <View style={styles.swatch4}></View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Pressable
-              style={styles.btn}
+      <View style={{flex:1, justifyContent: 'center'}}>
+        <ImageBackground source={background} style={styles.background}>
+          <View style={styles.titleWrapper}>
+            <Text style={styles.title}>Welcome!</Text>
+          </View>
+          <View style={styles.wrapper}>
+          <TextInput 
+              style={styles.namefield}
+              onChangeText={(name) => this.setState({ name })}
+              value={this.state.name}
+              placeholder='Your Name'
+            />
+            <Text style={styles.text}>Select a Background Color:</Text>
+            <View style={styles.colorsMenu}>
+            {colors.map((selectedColor) => (
+              <TouchableOpacity
               accessible={true}
-              accessibilityLabel="Start texting"
-              accessibilityHint="Lets you start a new chat session"
+              accessibilityLabel="Select Background Color"
+              accessibilityHint="Sets your chat screens background color."
               accessibilityRole="button"
-              onPress={() =>
-                this.props.navigation.navigate("Chat", {
-                  name: this.state.name,
-                  bgColor: this.state.bgColor,
-                  bgImage: this.state.bgImage,
-                })
-              }
-            >
-              <Text style={styles.btnText}>Start Texting</Text>
-            </Pressable>
+
+                key={selectedColor}
+                style={[
+                  styles.colorOptions(selectedColor),
+                  setColor === selectedColor ? styles.border : null,
+                ]}
+                activeOpacity={0.5}
+                onPress={() => this.setState({ backgroundColor: selectedColor })}
+              />
+            ))}
+          </View>
+            <TouchableOpacity
+              accessible={true}
+              accessibilityLabel="Go to chat"
+              accessibilityHint="Takes you to the chat screen."
+              accessibilityRole="button"
+              style={styles.button}
+              onPress={() => this.onGoToChat(this.state.name, this.state.backgroundColor)}>  
+                <Text style={styles.text}>
+                  GO TO CHAT
+                </Text>
+              </TouchableOpacity>
           </View>
         </ImageBackground>
       </View>
     );
-  }
+  };
 }
 
-// Styles for Start view
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    backgroundColor: "#151617",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
-  bgImage: {
+  background: {
     flex: 1,
-    width: "100%",
-    flexDirection: "column",
-    alignItems: "center",
+    resizeMode: 'cover',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+
   },
-  logo: {
-    width: "70%",
-    height: "auto",
-    resizeMode: "contain",
-    flex: 1,
+  titleWrapper: {
+    flex: 0.4,
+    justifyContent: 'space-evenly',
   },
-  h1: {
-    flexGrow: 1,
-    flexShrink: 1,
-    fontWeight: "800",
-    color: "transparent",
-    paddingTop: 60,
+  title: {
+    color: '#fff',
+    fontSize: 42,
+    fontWeight: 'bold',
+
   },
-  box: {
-    backgroundColor: "#ffffff",
-    flexGrow: 1,
-    flexShrink: 0,
-    width: "88%",
-    marginBottom: 30,
-    flexDirection: "column",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    padding: 30,
-    height: 260,
-    minHeight: 260,
-    maxHeight: 290,
-    borderRadius: 20,
+  text: {
+    color: "white",
+    fontSize: 16,
   },
-  inputField: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderWidth: 0.5,
-    borderColor: "#000",
-    height: 50,
-    borderRadius: 5,
+  namefield: {
+    backgroundColor: '#fff',
+    width: '80%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 5,
+  },
+  wrapper: {
+    backgroundColor: 'rgba(52, 52, 52, 0.8)',
+    borderColor: '#ffa500',
+    borderWidth: 1,
+    width: '88%',
+    flex: 0.6,
+    alignItems: 'center',
+    marginBottom: '8%',
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
+  },
+  colorsMenu: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  colorOptions: (selectedColor) => ({
+    backgroundColor: selectedColor,
+    width: 40,
+    height: 40,
     marginHorizontal: 10,
-    marginVertical: 0,
+    borderWidth: 2,
+    borderRadius: 50,
+  }),
+  border: {
+    borderWidth: 2,
+    borderColor: '#ffa500',
   },
-  iconStyle: {
-    //padding: 10,
-    marginLeft: 15,
-    marginRight: 15,
-    height: 25,
-    width: 25,
-    alignItems: "center",
-  },
-  input: {
-    flex: 1,
-    fontSize: 18,
-    color: "#888",
-  },
-  btn: {
-    flex: 1,
-    backgroundColor: "#6705e9",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    paddingVertical: 0,
-    paddingHorizontal: 32,
-    marginTop: 10,
-    width: "90%",
-    borderRadius: 5,
-  },
-  btnText: {
-    fontSize: 16,
-    marginTop: 0,
-    marginBottom: 0,
-    textAlign: "center",
-    color: "#fff",
-    textTransform: "uppercase",
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "300",
-    color: "#757083",
-    opacity: 1,
-    marginBottom: 10,
-  },
-  colorSwatch: {
-    flex: 1,
-    padding: 20,
-  },
-  swatches: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  swatch1: {
-    width: 40,
+  button: {
+    width: '80%',
     height: 40,
-    backgroundColor: "#04e0ac",
-    borderRadius: 40,
-  },
-  swatch2: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#f582a9",
-    borderRadius: 40,
-  },
-  swatch3: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#55e2fe",
-    borderRadius: 40,
-  },
-  swatch4: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#fdd55b",
-    borderRadius: 40,
+    backgroundColor: '#757083',
+    color: '#FFFFFF',
+    alignItems: 'center',
+    fontWeight: 'bold',
+    justifyContent: 'space-evenly',
   },
 });
-
-export default Start;
