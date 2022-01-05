@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Platform,
+  KeyboardAvoidingView,
+  LogBox,
+} from "react-native";
 import {
   Bubble,
   GiftedChat,
@@ -9,7 +15,7 @@ import {
 import MapView from "react-native-maps";
 import CustomActions from "./CustomActions";
 import firebase from "firebase/app";
-//import "firebase/firestore";
+import "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 
@@ -41,20 +47,13 @@ class Chat extends Component {
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    this.referenceChatMessages = firebase.firestore().collection("messages");
-    this.referenceMessageUser = null;
 
-    this.state = {
-      messages: [],
-      uid: 0,
-      user: {
-        _id: "",
-        name: "",
-      },
-      isConnected: false,
-      image: null,
-      location: null,
-    };
+    LogBox.ignoreLogs([
+      "Setting a timer",
+      "Warning: ...",
+      "undefined",
+      "Animated.event now requires a second argument for options",
+    ]);
   }
 
   componentDidMount() {
@@ -67,13 +66,18 @@ class Chat extends Component {
         this.setState({ isConnected: true });
         console.log("online");
 
+        // Reference to load messages via Firebase
+        this.referenceChatMessages = firebase
+          .firestore()
+          .collection("messages");
+
         // listen to authentication events
         this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
           if (!user) {
             firebase.auth().signInAnonymously();
           }
 
-          // Update user state with active user
+          // Add user to state
           this.setState({
             uid: user.uid,
             messages: [],
@@ -87,6 +91,7 @@ class Chat extends Component {
             .firestore()
             .collection("messages")
             .where("uid", "==", this.state.uid);
+
           // Listen for collection changes
           this.unsubscribe = this.referenceChatMessages
             .orderBy("createdAt", "desc")
